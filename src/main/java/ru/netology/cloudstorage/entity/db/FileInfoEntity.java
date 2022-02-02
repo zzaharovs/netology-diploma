@@ -17,11 +17,7 @@ public class FileInfoEntity {
     @Id
     private String fileName;
     @Id
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "username")
-//    private UserEntity username;
     private String username;
-//    @Lob
     @Column(nullable = false)
     private byte[] file;
     @Column(nullable = false)

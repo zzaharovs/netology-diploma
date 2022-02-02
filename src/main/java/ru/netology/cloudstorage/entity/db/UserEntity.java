@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -23,11 +20,6 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "username")
+    @OneToMany(mappedBy = "username", fetch = FetchType.LAZY)
     private List<FileInfoEntity> files;
-
-//    public UserEntity(String username, String password) {
-//        this.username = username;
-//        this.password = password;
-//    }
 }

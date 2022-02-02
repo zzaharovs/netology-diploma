@@ -23,8 +23,6 @@ public class FileInfoKey implements Serializable {
     private String fileName;
 
     @NotBlank
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private UserEntity username;
     private String username;
 
 
