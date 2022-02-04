@@ -7,7 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import ru.netology.cloudstorage.entity.db.UserEntity;
+import ru.netology.cloudstorage.entity.exception.InvalidJwtException;
 import ru.netology.cloudstorage.entity.exception.UserNotFoundException;
+import ru.netology.cloudstorage.repo.CloudJwtSecurityRepo;
 import ru.netology.cloudstorage.repo.CloudSecurityRepo;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class JwtAuthServiceImpl implements JwtAuthService {
 
     private final CloudSecurityRepo securityRepo;
+    private final CloudJwtSecurityRepo jwtSecurityRepo;
 
     public String generateToken(String secret) {
         String id = UUID.randomUUID().toString().replace("-", "");
@@ -38,7 +41,6 @@ public class JwtAuthServiceImpl implements JwtAuthService {
                     .compact();
         } catch (JwtException e) {
             e.printStackTrace();
-            //ignore
         }
         return token;
     }
@@ -53,13 +55,12 @@ public class JwtAuthServiceImpl implements JwtAuthService {
             Jwts.parser().setSigningKey(user.getPassword() + user.getUsername()).parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException expEx) {
-            System.out.println("ex1");
-//            log.severe("Token expired");
+            jwtSecurityRepo.deleteById(token);
+            throw new InvalidJwtException("Token expired");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-//            log.severe("invalid token");
+            jwtSecurityRepo.deleteById(token);
+            throw new InvalidJwtException("Invalid token");
         }
-        return false;
     }
 
 

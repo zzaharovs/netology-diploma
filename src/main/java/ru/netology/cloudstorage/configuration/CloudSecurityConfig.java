@@ -1,33 +1,22 @@
 package ru.netology.cloudstorage.configuration;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import ru.netology.cloudstorage.security.CloudTokenAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import ru.netology.cloudstorage.repo.CloudJwtSecurityRepo;
+import ru.netology.cloudstorage.security.filters.CloudSecurityExceptionHandlerFilter;
+import ru.netology.cloudstorage.security.filters.CloudTokenAuthenticationFilter;
 import ru.netology.cloudstorage.security.CloudUserDetailsService;
-//import ru.netology.cloudstorage.security.cors.CorsFilter;
+import ru.netology.cloudstorage.security.jwt.JwtAuthServiceImpl;
 
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @AllArgsConstructor
@@ -35,7 +24,8 @@ import java.util.List;
 public class CloudSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CloudUserDetailsService userDetailsService;
-    private final CloudTokenAuthenticationFilter tokenAuthenticationFilter;
+    private final CloudJwtSecurityRepo jwtSecurityRepo;
+    private final JwtAuthServiceImpl jwtAuthService;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -49,14 +39,24 @@ public class CloudSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .logout().disable()
-                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(cloudSecurityHandler(), LogoutFilter.class)
+                .addFilterBefore(cloudTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests().antMatchers("/login").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/logout").permitAll()
                 .and()
-                .authorizeRequests().anyRequest().authenticated();
+                .authorizeRequests().anyRequest().authenticated(); //failureHandler(cloudExceptionHandler);;;
     }
 
+    @Bean
+    public CloudTokenAuthenticationFilter cloudTokenFilter() {
+        return new CloudTokenAuthenticationFilter(jwtSecurityRepo, userDetailsService, jwtAuthService);
+    }
+
+    @Bean
+    public CloudSecurityExceptionHandlerFilter cloudSecurityHandler() {
+        return new CloudSecurityExceptionHandlerFilter();
+    }
 
     @Bean
     public FilterRegistrationBean<CloudTokenAuthenticationFilter> myFilterRegistrationBean(CloudTokenAuthenticationFilter filter) {

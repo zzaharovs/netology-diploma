@@ -1,6 +1,7 @@
 package ru.netology.cloudstorage.security;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,13 +13,12 @@ import ru.netology.cloudstorage.security.jwt.JwtAuthService;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class CloudAuthServiceImpl implements CloudAuthService {
 
     private final JwtAuthService service;
     private final UserDetailsService userDetailsService;
     private final CloudJwtSecurityRepo jwtSecurityRepo;
-
-    private static final String TOKEN_SECRET = "dummy";
 
     @Override
     public String getAuthTokenByUsernameAndPassword(String username, String password) {
@@ -32,21 +32,20 @@ public class CloudAuthServiceImpl implements CloudAuthService {
     @Override
     public HttpStatus deleteTokenAndLogout(String token) {
         jwtSecurityRepo.deleteById(token.substring(7));
+        log.info("Токен успешно удален из базы");
         return HttpStatus.OK;
     }
 
-    private boolean validateUser (String username, String password) {
+    private boolean validateUser(String username, String password) {
         UserDetails currentUser = userDetailsService.loadUserByUsername(username);
         return username.equals(currentUser.getUsername()) && password.equals(currentUser.getPassword());
     }
 
-    private String saveTokenToDatabase(String token, String username){
+    private String saveTokenToDatabase(String token, String username) {
         jwtSecurityRepo.save(new UserJwtEntity(token, username));
+        log.info("Токен для пользователя {} сгенерирован и успешно сохранен в базу", username );
         return token;
     }
-
-
-
 
 
 }
