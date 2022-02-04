@@ -16,7 +16,7 @@ public class UserJwtEntity {
 
     @Id
     private String jwtToken;
-
+    @Column(nullable = false)
     private String username;
 
 }

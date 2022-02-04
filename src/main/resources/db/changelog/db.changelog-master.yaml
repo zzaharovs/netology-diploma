@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: zzaharovs
+      changes:
+        - createTable:
+            tableName: file_info_entity
+            columns:
+              - column:
+                  name: file_name
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: file
+                  type: bytea
+                  constraints:
+                    nullable: false
+              - column:
+                  name: size
+                  type: int8
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 2
+      author: zzaharovs
+      changes:
+        - createTable:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: zzaharovs
+      changes:
+        - createTable:
+            tableName: user_jwt_entity
+            columns:
+              - column:
+                  name: jwt_token
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 4
+      author: zzaharovs
+      changes:
+        - insert:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: username
+                  value: demo_user1
+              - column:
+                  name: password
+                  value: pass1
+        - insert:
+            tableName: user_entity
+            columns:
+              - column:
+                  name: username
+                  value: demo_user2
+              - column:
+                  name: password
+                  value: pass2
