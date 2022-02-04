@@ -6,13 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.netology.cloudstorage.entity.db.FileInfoEntity;
 import ru.netology.cloudstorage.entity.db.FileInfoKey;
+import ru.netology.cloudstorage.entity.response.FileInfo;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
 public interface CloudFilesRepo extends JpaRepository<FileInfoEntity, FileInfoKey> {
 
-    List<FileInfoEntity> findByUsername(String username);
+    @Query(value = "select new ru.netology.cloudstorage.entity.response.FileInfo(fie.fileName, fie.size) " +
+            " from FileInfoEntity fie " +
+            "where fie.username = :username")
+    List<FileInfo> findByName(@Param("username") String name);
 
     @Modifying
     @Transactional

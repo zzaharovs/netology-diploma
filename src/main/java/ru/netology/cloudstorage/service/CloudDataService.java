@@ -11,13 +11,13 @@ public interface CloudDataService {
 
     List<FileInfo> getFileNames();
 
-    HttpStatus uploadFile(String authToken, String fileName, MultipartFile file) throws IOException;
+    HttpStatus uploadFile(String fileName, MultipartFile file) throws IOException;
 
-    HttpStatus editFileName(String authToken, String currentFileName, String newFileName);
+    HttpStatus editFileName(String currentFileName, String newFileName);
 
-    byte [] getFileByName(String authToken, String fileName);
+    byte [] getFileByName(String fileName);
 
-    HttpStatus deleteFile(String authToken, String fileName);
+    HttpStatus deleteFile(String fileName);
 
 
 

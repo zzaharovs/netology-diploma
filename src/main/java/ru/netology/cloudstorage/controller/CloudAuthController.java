@@ -1,31 +1,39 @@
 package ru.netology.cloudstorage.controller;
 
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.netology.cloudstorage.entity.request.AuthUserData;
+import ru.netology.cloudstorage.entity.security.AuthUserData;
 import ru.netology.cloudstorage.entity.response.AuthToken;
+import ru.netology.cloudstorage.security.CloudAuthService;
+
+import javax.validation.constraints.NotBlank;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:8080/","http://localhost:8787"}, allowCredentials = "true",
-        allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(
+        origins = {"http://localhost:8080"},
+        allowCredentials = "true",
+        allowedHeaders = "*",
+        methods = {RequestMethod.POST, RequestMethod.OPTIONS})
+@AllArgsConstructor
+@Validated
 public class CloudAuthController {
 
-    private String token;
+    private final CloudAuthService authService;
 
     @PostMapping("/login")
-    public AuthToken login(@RequestBody AuthUserData userData)
-    {
-        token = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY0MzU0ODcwNCwiaWF0IjoxNjQzNTQ4NzA0fQ.KZGKelwZMJtppCv8HVFaHcSwvmn5VIvteYN7Enu_OUA";
+    public AuthToken login(@RequestBody AuthUserData userData) {
+        final String token = authService.getAuthTokenByUsernameAndPassword(userData.getLogin(), userData.getPassword());
         return new AuthToken(token);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<HttpStatus> logout()
-    {
-        token = null;
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<HttpStatus> logout(@RequestHeader("auth-token") @NotBlank String token) {
+        return new ResponseEntity<>(authService.deleteTokenAndLogout(token));
     }
+
 
 }
