@@ -1,6 +1,7 @@
 package ru.netology.cloudstorage.security;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,16 @@ public class CloudAuthServiceImpl implements CloudAuthService {
     @Override
     public String getAuthTokenByUsernameAndPassword(String username, String password) {
         if (validateUser(username, password)) {
-            String token = service.generateToken(password + TOKEN_SECRET + username);
+            String token = service.generateToken(password + username);
             return saveTokenToDatabase(token, username);
         }
         throw new InvalidAccessDataException("invalid username or password");
+    }
+
+    @Override
+    public HttpStatus deleteTokenAndLogout(String token) {
+        jwtSecurityRepo.deleteById(token.substring(7));
+        return HttpStatus.OK;
     }
 
     private boolean validateUser (String username, String password) {
@@ -37,6 +44,8 @@ public class CloudAuthServiceImpl implements CloudAuthService {
         jwtSecurityRepo.save(new UserJwtEntity(token, username));
         return token;
     }
+
+
 
 
 

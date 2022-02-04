@@ -4,10 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import ru.netology.cloudstorage.entity.db.UserJwtEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CloudJwtSecurityRepo extends JpaRepository<UserJwtEntity, String> {
 
 
-    UserJwtEntity findDistinctByJwtToken(String jwtToken);
+    Optional<UserJwtEntity> findDistinctByJwtToken(String jwtToken);
 
 }

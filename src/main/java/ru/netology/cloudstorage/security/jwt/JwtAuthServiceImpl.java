@@ -1,9 +1,14 @@
 package ru.netology.cloudstorage.security.jwt;
 
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import ru.netology.cloudstorage.entity.db.UserEntity;
+import ru.netology.cloudstorage.entity.exception.UserNotFoundException;
+import ru.netology.cloudstorage.repo.CloudSecurityRepo;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -11,7 +16,10 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class JwtAuthServiceImpl implements JwtAuthService {
+
+    private final CloudSecurityRepo securityRepo;
 
     public String generateToken(String secret) {
         String id = UUID.randomUUID().toString().replace("-", "");
@@ -36,8 +44,22 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     }
 
     @Override
-    public boolean validateToken(String token) {
-        return token != null;
+    public boolean validateToken(String token, String username) {
+
+        UserEntity user = securityRepo.findById(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        try {
+            Jwts.parser().setSigningKey(user.getPassword() + user.getUsername()).parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException expEx) {
+            System.out.println("ex1");
+//            log.severe("Token expired");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+//            log.severe("invalid token");
+        }
+        return false;
     }
 
 

@@ -10,27 +10,26 @@ import ru.netology.cloudstorage.entity.response.AuthToken;
 import ru.netology.cloudstorage.security.CloudAuthService;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:8080/","http://localhost:8787"}, allowCredentials = "true",
-        allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(
+        origins = {"http://localhost:8080"},
+        allowCredentials = "true",
+        allowedHeaders = "*",
+        methods = {RequestMethod.POST, RequestMethod.OPTIONS})
 @AllArgsConstructor
 public class CloudAuthController {
 
     private final CloudAuthService authService;
 
     @PostMapping("/login")
-    public AuthToken login(@RequestBody AuthUserData userData)
-    {
+    public AuthToken login(@RequestBody AuthUserData userData) {
         final String token = authService.getAuthTokenByUsernameAndPassword(userData.getLogin(), userData.getPassword());
-//        System.out.println(userData.getLogin());
-//        System.out.println(userData.getPassword());
-//        token = "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY0MzU0ODcwNCwiaWF0IjoxNjQzNTQ4NzA0fQ.KZGKelwZMJtppCv8HVFaHcSwvmn5VIvteYN7Enu_OUA";
         return new AuthToken(token);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<HttpStatus> logout()
-    {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<HttpStatus> logout(@RequestHeader("auth-token") String token) {
+        return new ResponseEntity<>(authService.deleteTokenAndLogout(token));
     }
+
 
 }
