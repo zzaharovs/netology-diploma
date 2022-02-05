@@ -11,10 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import ru.netology.cloudstorage.repo.CloudJwtSecurityRepo;
+import ru.netology.cloudstorage.security.CloudUserDetailsService;
 import ru.netology.cloudstorage.security.filters.CloudSecurityExceptionHandlerFilter;
 import ru.netology.cloudstorage.security.filters.CloudTokenAuthenticationFilter;
-import ru.netology.cloudstorage.security.CloudUserDetailsService;
 import ru.netology.cloudstorage.security.jwt.JwtAuthServiceImpl;
 
 
@@ -24,7 +23,6 @@ import ru.netology.cloudstorage.security.jwt.JwtAuthServiceImpl;
 public class CloudSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CloudUserDetailsService userDetailsService;
-    private final CloudJwtSecurityRepo jwtSecurityRepo;
     private final JwtAuthServiceImpl jwtAuthService;
 
     @Override
@@ -45,12 +43,12 @@ public class CloudSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests().antMatchers("/logout").permitAll()
                 .and()
-                .authorizeRequests().anyRequest().authenticated(); //failureHandler(cloudExceptionHandler);;;
+                .authorizeRequests().anyRequest().authenticated();
     }
 
     @Bean
     public CloudTokenAuthenticationFilter cloudTokenFilter() {
-        return new CloudTokenAuthenticationFilter(jwtSecurityRepo, userDetailsService, jwtAuthService);
+        return new CloudTokenAuthenticationFilter(userDetailsService, jwtAuthService);
     }
 
     @Bean

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,13 +27,15 @@ public class CloudUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        log.info("Поиск пользователя в базе по указанному логину {}", username);
         UserEntity currentUser = securityRepo.findById(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found. Contact your system administrator"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         List<GrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority("USER"));
-        User user = new User(currentUser.getUsername(), currentUser.getPassword(), roles);
-        log.info("Аутентификация успешна");
-        return user;
+        roles.add(new SimpleGrantedAuthority("ROLE_USER"));
+        return new User(currentUser.getUsername(), currentUser.getPassword(), roles);
     }
+
+    public String getUsernameByContext() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
 }
