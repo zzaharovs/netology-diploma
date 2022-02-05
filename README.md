@@ -24,7 +24,7 @@ ___
 ___
 ### Техническая реализация
 
-Серверная часть была написана по требованиям, указанным в предоставленной [спецификации OpenAPI](https://github.com/netology-code/jd-homeworks/blob/master/diploma/CloudServiceSpecification.yaml).
+Серверная часть была написана по требованиям, указанным в предоставленной [спецификации OpenAPI](https://github.com/zzaharovs/netology-diploma/blob/develop/cloud-storage.yaml).
 
 Сервис представляет собой SpringBoot приложение реализующие основные CRUD-операции и защищенное Spring Security. По дефолту фронт использует порт 8080, бэк - 8787
 
