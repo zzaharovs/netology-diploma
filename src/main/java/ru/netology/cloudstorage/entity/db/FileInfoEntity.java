@@ -1,9 +1,11 @@
 package ru.netology.cloudstorage.entity.db;
 
 import lombok.*;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 @Entity
 @Getter
@@ -11,6 +13,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @IdClass(FileInfoKey.class)
 public class FileInfoEntity {
 

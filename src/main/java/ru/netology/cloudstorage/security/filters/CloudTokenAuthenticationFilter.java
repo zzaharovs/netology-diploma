@@ -7,8 +7,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 import ru.netology.cloudstorage.entity.db.UserJwtEntity;
-import ru.netology.cloudstorage.entity.exception.InvalidJwtException;
-import ru.netology.cloudstorage.repo.CloudJwtSecurityRepo;
 import ru.netology.cloudstorage.security.CloudUserDetailsService;
 import ru.netology.cloudstorage.security.jwt.JwtAuthServiceImpl;
 
@@ -23,12 +21,10 @@ import java.io.IOException;
 @Slf4j
 public class CloudTokenAuthenticationFilter extends GenericFilterBean {
 
-    private final CloudJwtSecurityRepo jwtSecurityRepo;
     private final CloudUserDetailsService userDetailsService;
     private final JwtAuthServiceImpl jwtAuthService;
 
     public static final String JWT_REQUEST_HEADER = "auth-token";
-
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -37,8 +33,7 @@ public class CloudTokenAuthenticationFilter extends GenericFilterBean {
 
         if (token != null) {
             log.info("Проверка наличия токена в базе и его валидности");
-            UserJwtEntity userJwt = jwtSecurityRepo.findDistinctByJwtToken(token.substring(7))
-                    .orElseThrow(() -> new InvalidJwtException("User haven't jwt-token"));
+            UserJwtEntity userJwt = jwtAuthService.getUserByToken(token.substring(7));
             if (jwtAuthService.validateToken(userJwt.getJwtToken(), userJwt.getUsername())) {
                 UserDetails currentUser = userDetailsService.loadUserByUsername(userJwt.getUsername());
                 UsernamePasswordAuthenticationToken authenticationToken =
