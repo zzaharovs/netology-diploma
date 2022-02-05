@@ -1,9 +1,11 @@
 package ru.netology.cloudstorage.entity.db;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
@@ -11,15 +13,17 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class FileInfoKey implements Serializable {
+
+    public static final long serialVersionUID = 1L;
 
     @NotBlank
     @Column(nullable = false)
     private String fileName;
 
     @NotBlank
-    @Column(nullable = false)
-    private String ownerLogin;
+    private String username;
 
 
 }

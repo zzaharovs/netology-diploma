@@ -1,20 +1,29 @@
 package ru.netology.cloudstorage.entity.db;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@IdClass(FileInfoKey.class)
 public class FileInfoEntity {
 
-
-    @EmbeddedId
-    private FileInfoKey key;
+    @Id
+    private String fileName;
+    @Id
+    private String username;
+    @Column(nullable = false)
     private byte[] file;
+    @Column(nullable = false)
     private Long size;
 
 }
